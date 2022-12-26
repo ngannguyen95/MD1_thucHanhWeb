@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+<div class="container">
+
+    <div class="mb-3 row">
+        <label for="inputUsername" class="col-sm-2 col-form-label">Username</label>
+        <div class="col-sm-10">
+            <input oninput="validate()" type="text" class="form-control" id="inputUsername">
+            <p class="text-danger" id="failUsername"></p>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
+        <div class="col-sm-10">
+            <input oninput="validate()" type="text" class="form-control" id="inputEmail">
+            <p class="text-danger" id="failEmail"></p>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+        <div class="col-sm-10">
+            <input oninput="validate()" type="password" class="form-control" id="inputPassword">
+            <p class="text-danger" id="failPassword"></p>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label for="inputRePassword" class="col-sm-2 col-form-label">RePassword</label>
+        <div class="col-sm-10">
+            <input oninput="validate()" type="password" class="form-control" id="inputRePassword">
+            <p class="text-danger" id="failRePassword"></p>
+        </div>
+    </div>
+    <div class="text-center">
+        <button type="button" onclick="submitData()" class="btn btn-success submitData">Submit</button>
+    </div>
+
+
+</div>
+
+<script src="register.js"></script>
+
+<script>
+    let userNameInput = document.querySelector('#inputUsername');
+    let emailInput = document.querySelector('#inputEmail');
+    let passwordInput = document.querySelector('#inputPassword');
+    let rePasswordInput = document.querySelector('#inputRePassword');
+    let submit = document.querySelector(".submitData"); //lấy dữ liệu từ cha qua class con
+    let isCheck;
+    let user;
+    let arr;
+    if (localStorage.getItem('listUser') == null) {
+        arr = [];
+    } else {
+        arr = JSON.parse(localStorage.getItem('listUser'))  //JSON.pare chuỗi sang mảng
+    }
+    console.log('arr----->', arr)
+
+    function validate() {
+
+        let check = true;
+        let username = userNameInput.value;
+        let email = emailInput.value;
+        let password = passwordInput.value;
+        let rePassword = rePasswordInput.value;
+        const EMAIL_PATTERN = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
+        if (username.trim() == '') {
+            document.querySelector('#failUsername').innerHTML = 'Không được để trống!';
+            check = false;
+        } else if (username.length < 6) {
+            document.querySelector('#failUsername').innerHTML = 'Tên đăng nhập ít nhất 6 kí tự';
+            check = false;
+        } else if (checkUsernameExist(username)) {
+            document.querySelector('#failUsername').innerHTML = 'Tên đăng nhập đã tồn tại, vui lòng đặt tên khác';
+            check = false;
+        } else {
+            document.querySelector('#failUsername').innerHTML = "";
+        }
+
+
+        if (email.trim() == '') {
+            document.querySelector('#failEmail').innerHTML = 'Không được để trống!';
+            check = false;
+        } else if (!EMAIL_PATTERN.test(email)) {
+            document.querySelector('#failEmail').innerHTML = 'Email không đúng định dạng';
+            check = false;
+        } else if (checkEmailExit(email)){
+            document.querySelector('#failEmail').innerHTML = 'Email đã tồn tại, vui lòng nhập lại';
+            check = false;
+        }else {
+            document.querySelector('#failEmail').innerHTML = '';
+        }
+
+
+        if (password.trim() == '') {
+            document.querySelector('#failPassword').innerHTML = 'Không được để trống, vui lòng nhập mật khẩu';
+            check = false;
+        } else if (password.length < 8) {
+            document.querySelector('#failPassword').innerHTML = 'Mật khẩu tối thiểu 8 kí tự';
+            check = false;
+        } else {
+            document.querySelector('#failPassword').innerHTML = '';
+        }
+
+        // console.log(password + "-----------------" + rePassword)
+        if (password !== rePassword) {
+            document.querySelector('#failRePassword').innerHTML = 'Mật khẩu không trùng khớp';
+            check = false;
+        } else {
+            document.querySelector('#failRePassword').innerHTML = '';
+        }
+
+        if (check) {
+            isCheck = true;
+            user = new User(username, email, password)
+        } else {
+            isCheck = false;
+        }
+    }
+
+    function submitData() {
+        if (isCheck) {// lưu dược thành công thì ghi vào local..
+            arr.push(user)
+            localStorage.setItem('listUser', JSON.stringify(arr));// dung JSON.stringify truyen mảng ve chuỗi
+            location.href = "home.html"
+        }
+    }
+
+    function checkUsernameExist(userNameCheck) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].username === userNameCheck) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkEmailExit(emailCheck) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i].email === emailCheck) {
+                return true;
+            }
+        }
+    }
+    
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+</body>
+</html>
